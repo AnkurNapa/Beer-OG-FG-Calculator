@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Craft Beer OG/FG Calculator | Brewer's Toolkit</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      flex-direction: column;
+    }
+    .card {
+      background-color: #1e1e1e;
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    h1 {
+      text-align: center;
+      color: #ffcc00;
+      font-size: 1.8rem;
+      margin-bottom: 0.7rem;
+    }
+    .description {
+      text-align:center;
+      color:#ffe066;
+      margin:0 0 1.4em 0;
+      font-size:1.04em;
+      font-weight:400;
+    }
+    label {
+      margin-top: 1rem;
+      display: block;
+      color: #ccc;
+    }
+    input {
+      width: 100%;
+      margin-top: 0.3rem;
+      padding: 0.7rem;
+      font-size: 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      background-color: #ffcc00;
+      color: #000;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #e6b800;
+    }
+    .result {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      text-align: center;
+      color: #fff;
+    }
+    .footer {
+      background: #1a1a1a;
+      padding: 2rem 1rem;
+      text-align: center;
+      border-top: 1px solid #333;
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 800px;
+      border-radius: 16px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+    .footer h3 {
+      color: #3498db;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .footer-links {
+      margin: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .footer-links a {
+      color: #ffcc00;
+      background-color: #2a2a2a;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .footer-links a:hover {
+      background-color: #444;
+      transform: translateY(-2px);
+    }
+    .footer-disclaimer {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+    @media (max-width: 650px) { .card, .footer { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Craft Beer OG/FG Calculator</h1>
+    <p class="description">
+      Instantly get alcohol (ABV), attenuation, and calories for any beer.<br>
+      Just enter your <b>Anton Paar instrument readings</b> (OG and FG) here to reveal your batch's true numbers — powered by professional brewing math!
+    </p>
+    <label for="og">Original Gravity (OG):</label>
+    <input type="number" id="og" placeholder="e.g. 1.050" min="1" step="0.001">
+
+    <label for="fg">Final Gravity (FG):</label>
+    <input type="number" id="fg" placeholder="e.g. 1.010" min="0.9" step="0.001">
+
+    <button onclick="calculateBeer()">Calculate</button>
+    <button onclick="resetBeerCalc()">Reset</button>
+
+    <div class="result" id="result"></div>
+  </div>
+  <div class="footer">
+    <h3>Connect with Ankur Napa</h3>
+    <p>Professional Brewing Consultant & Craft Beer Expert</p>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/ankur-napa/" target="_blank">🔗 LinkedIn Profile</a>
+      <a href="https://wa.me/917755909445?text=Hi%20Ankur,%20I%20found%20your%20hops%20calculator%20and%20would%20like%20to%20connect!" target="_blank">📱 WhatsApp Consultation</a>
+      <a href="https://nas.io/craftbeer" target="_blank">🎓 Online Craft Beer School</a>
+    </div>
+    <div class="footer-disclaimer">
+      <strong>Formulae:</strong> Standard brewing equations for OE, AE, RE, ABV, ADF, RDF, calories. Enter OG and FG to get key beer stats.<br/>
+      <em>Need a custom calculator for your brewery? Contact me above!</em>
+    </div>
+  </div>
+  <script>
+    function calculateBeer() {
+      const og = parseFloat(document.getElementById('og').value);
+      const fg = parseFloat(document.getElementById('fg').value);
+      const resultDiv = document.getElementById('result');
+      if (isNaN(og) || isNaN(fg)) {
+        resultDiv.innerHTML = '<span style="color:#ff7675;">❗ Please enter valid OG and FG values.</span>';
+        return;
+      }
+      if (og < 1.000 || og > 1.200 || fg < 0.980 || fg > 1.200) {
+        resultDiv.innerHTML = '<span style="color:#ff7675;">❗ OG should be 1.000–1.200, FG 0.980–1.200.</span>';
+        return;
+      }
+      if (fg >= og) {
+        resultDiv.innerHTML = '<span style="color:#ff7675;">❗ FG must be less than OG.</span>';
+        return;
+      }
+      const OE = (og - 1) * 1000 / 4;
+      const AE = (fg - 1) * 1000 / 4;
+      const RE = (0.1808 * OE) + (0.8192 * AE);
+      const ADF = ((OE - AE) / OE) * 100;
+      const RDF = ((OE - RE) / OE) * 100;
+      const ABW = (OE - RE) / (2.0665 - (0.010665 * OE));
+      const ABV = ABW * (fg / 0.794);
+      const Calories = 3.55 * ((3.8 * RE) + (7.1 * ABW) + (4.0 * 0.07 * RE));
+      function f(num, dec=2) { return isNaN(num) ? '-' : num.toFixed(dec); }
+      resultDiv.innerHTML = `
+        <table style="margin:0 auto; width:96%; text-align:left; font-size:1.04em;">
+          <tr><td>Original Extract (OE):</td><td>${f(OE)} °P</td></tr>
+          <tr><td>Apparent Extract (AE):</td><td>${f(AE)} °P</td></tr>
+          <tr><td>Real Extract (RE):</td><td>${f(RE)} °P</td></tr>
+          <tr><td>Apparent Degree of Fermentation (ADF):</td><td>${f(ADF)} %</td></tr>
+          <tr><td>Real Degree of Fermentation (RDF):</td><td>${f(RDF)} %</td></tr>
+          <tr><td>Alcohol by Weight (ABW):</td><td>${f(ABW)} %</td></tr>
+          <tr><td>Alcohol by Volume (ABV):</td><td>${f(ABV)} %</td></tr>
+          <tr><td>Calories (12oz/355ml):</td><td>${f(Calories,0)} kcal</td></tr>
+        </table>
+        <div style="margin-top:1.2em; color:#ffe066;">All calculations use industry-standard formulas. No data stored.</div>
+      `;
+    }
+    function resetBeerCalc() {
+      document.getElementById('og').value = '';
+      document.getElementById('fg').value = '';
+      document.getElementById('result').innerHTML = '';
+    }
+  </script>
+</body>
+</html>
